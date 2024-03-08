@@ -1,8 +1,10 @@
 let TASKS = [];
 
 $(document).ready(() => {
+  getAllTasksFromLocalStorage();
   prepareTasksCard();
   $("#taskForm").submit((e) => submitHandler(e));
+  $("#searchTask").on("keyup", () => searchTasks());
 });
 
 function submitHandler(e) {
@@ -69,26 +71,22 @@ function resetForm() {
   $("#taskDesc").val("");
 }
 
-function prepareTasksCard() {
-  getAllTasksFromLocalStorage();
-
+function prepareTasksCard(tasks = TASKS) {
   let html = "";
 
-  if (TASKS.length <= 0) {
+  if (tasks.length <= 0) {
     html = `<h3>No Tasks to display :(</h3>`;
   } else {
-    html = TASKS.map((task) => {
-      return `<div class="task ${
-        task.status === "In Progress"
-          ? "inProgress"
-          : task.status === "Pending"
+    html = tasks.map((task) => {
+      return `<div class="task ${task.status === "In Progress"
+        ? "inProgress"
+        : task.status === "Pending"
           ? "pending"
           : "completed"
-      }" id="${task.id}">
+        }" id="${task.id}">
             <h3 class="title">${task.title}</h3>
-            <p class="assignedBy">Assigned by: <span>${
-              task.assignedBy
-            }</span></p>
+            <p class="assignedBy">Assigned by: <span>${task.assignedBy
+        }</span></p>
             <p class="dueDate">Due date: <span>${task.dueDate}</span></p>
             <p class="desc">${task.desc}</p>
             <p class="status">Status: <span>${task.status}</span></p>
@@ -107,4 +105,17 @@ function addTaskToLocalStorage(formObj) {
   getAllTasksFromLocalStorage();
   TASKS.push(formObj);
   localStorage.setItem("tasks", JSON.stringify(TASKS));
+}
+
+function searchTasks() {
+  const searchText = $("#searchTask").val().trim().toLowerCase();
+  if (searchText !== "") {
+    const filteredTasks = Array.prototype.filter.call(TASKS, (task) => {
+      return task.title.toLowerCase().startsWith(searchText) ||
+        task.assignedBy.toLowerCase().startsWith(searchText);
+    });
+    prepareTasksCard(filteredTasks);
+  } else {
+    prepareTasksCard(TASKS);
+  }
 }
