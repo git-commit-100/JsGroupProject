@@ -84,7 +84,7 @@ function prepareTasksCard() {
           : task.status === "Pending"
           ? "pending"
           : "completed"
-      }" id="task-${task.id}">
+      }" id="${task.id}">
             <h3 class="title">${task.title}</h3>
             <p class="assignedBy">Assigned by: <span>${
               task.assignedBy
