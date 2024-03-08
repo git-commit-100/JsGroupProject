@@ -8,28 +8,28 @@ $(document).ready(() => {
 function submitHandler(e) {
   e.preventDefault();
 
-  let inputTitle = $("#taskTitle")[0].value;
-  let inputAssigned = $("#assignedBy")[0].value;
-  let inputStatus = $("#taskStatus")[0].value;
-  let inputDate = $("#taskDueDate")[0].value;
-  let inputDesc = $("#taskDesc")[0].value;
+  let inputTitle = $("#taskTitle").val();
+  let inputAssigned = $("#assignedBy").val();
+  let inputStatus = $("#taskStatus").val();
+  let inputDate = $("#taskDueDate").val();
+  let inputDesc = $("#taskDesc").val();
 
   // form validation
-  if (!inputTitle || inputTitle === "") {
+  if (!inputTitle.trim()) {
     $("#taskTitle + p").css("display", "block");
     return;
   } else {
     $("#taskTitle + p").css("display", "none");
   }
 
-  if (!inputDate || inputDate === "") {
+  if (!inputDate.trim()) {
     $("#taskDueDate + p").css("display", "block");
     return;
   } else {
     $("#taskDueDate + p").css("display", "none");
   }
 
-  if (!inputDesc || inputDesc === "") {
+  if (!inputDesc.trim()) {
     $("#taskDesc + p").css("display", "block");
     return;
   } else {
@@ -57,9 +57,8 @@ function getAllTasksFromLocalStorage() {
   if (!allTasks) {
     TASKS = [];
   } else {
-    TASKS = [...JSON.parse(allTasks)]
+    TASKS = JSON.parse(allTasks);
   }
-  return;
 }
 
 function resetForm() {
@@ -85,7 +84,7 @@ function prepareTasksCard() {
           : task.status === "Pending"
           ? "pending"
           : "completed"
-      }" id="${task.id}">
+      }" id="task-${task.id}">
             <h3 class="title">${task.title}</h3>
             <p class="assignedBy">Assigned by: <span>${
               task.assignedBy
@@ -94,14 +93,14 @@ function prepareTasksCard() {
             <p class="desc">${task.desc}</p>
             <p class="status">Status: <span>${task.status}</span></p>
             <div class="actions">
-            <button class="edit" id="editBtn">Edit Task</button>
-            <button class="delete" id="deleteBtn">Delete Task</button>
+            <button class="edit">Edit Task</button>
+            <button class="delete">Delete Task</button>
             </div>
             </div>`;
     }).join("");
   }
 
-  $("#tasks").append(html);
+  $("#tasks").html(html);
 }
 
 function addTaskToLocalStorage(formObj) {
