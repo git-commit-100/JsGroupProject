@@ -4,7 +4,12 @@ $(document).ready(() => {
   getAllTasksFromLocalStorage();
   prepareTasksCard();
   $("#taskForm").submit((e) => submitHandler(e));
-  $("#searchTask").on("keyup", () => searchTasks());
+  $("#searchTask").on("input", () => searchTasks());
+  $("#searchTask").on("search", () => {
+    if ($("#searchTask").val() === "") {
+      prepareTasksCard();
+    }
+  });
 });
 
 function submitHandler(e) {
