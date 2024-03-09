@@ -15,6 +15,7 @@ function submitHandler(e) {
   let inputStatus = $("#taskStatus").val();
   let inputDate = $("#taskDueDate").val();
   let inputDesc = $("#taskDesc").val();
+  let inputPriority = $("#taskPriority").val();
 
   // form validation
   if (!inputTitle.trim()) {
@@ -46,10 +47,12 @@ function submitHandler(e) {
     dueDate: new Date(inputDate).toDateString(),
     assignedBy: inputAssigned,
     status: inputStatus,
+    priority: inputPriority,
   };
 
   addTaskToLocalStorage(formObj);
-  resetForm();
+  // resetting form
+  $("#taskForm").trigger("reset");
   prepareTasksCard();
 }
 
@@ -63,30 +66,33 @@ function getAllTasksFromLocalStorage() {
   }
 }
 
-function resetForm() {
-  $("#taskTitle").val("");
-  $("#assignedBy").val("");
-  $("#taskStatus").val("");
-  $("#taskDueDate").val("");
-  $("#taskDesc").val("");
-}
-
 function prepareTasksCard(tasks = TASKS) {
   let html = "";
 
   if (tasks.length <= 0) {
     html = `<h3>No Tasks to display :(</h3>`;
   } else {
-    html = tasks.map((task) => {
-      return `<div class="task ${task.status === "In Progress"
-        ? "inProgress"
-        : task.status === "Pending"
-          ? "pending"
-          : "completed"
+    html = tasks
+      .map((task) => {
+        return `<div class="task ${
+          task.status === "In Progress"
+            ? "inProgress"
+            : task.status === "Pending"
+            ? "pending"
+            : "completed"
         }" id="${task.id}">
-            <h3 class="title">${task.title}</h3>
-            <p class="assignedBy">Assigned by: <span>${task.assignedBy
-        }</span></p>
+            <h3 class="title">${task.title} 
+            ${
+              task.priority === "High"
+                ? `<span class="badge">
+            <iconify-icon icon="solar:danger-circle-bold"></iconify-icon>
+            </span>`
+                : ""
+            }
+            </h3>
+            <p class="assignedBy">Assigned by: <span>${
+              task.assignedBy
+            }</span></p>
             <p class="dueDate">Due date: <span>${task.dueDate}</span></p>
             <p class="desc">${task.desc}</p>
             <p class="status">Status: <span>${task.status}</span></p>
@@ -95,7 +101,8 @@ function prepareTasksCard(tasks = TASKS) {
             <button class="delete">Delete Task</button>
             </div>
             </div>`;
-    }).join("");
+      })
+      .join("");
   }
 
   $("#tasks").html(html);
@@ -111,8 +118,10 @@ function searchTasks() {
   const searchText = $("#searchTask").val().trim().toLowerCase();
   if (searchText !== "") {
     const filteredTasks = Array.prototype.filter.call(TASKS, (task) => {
-      return task.title.toLowerCase().startsWith(searchText) ||
-        task.assignedBy.toLowerCase().startsWith(searchText);
+      return (
+        task.title.toLowerCase().includes(searchText) ||
+        task.assignedBy.toLowerCase().includes(searchText)
+      );
     });
     prepareTasksCard(filteredTasks);
   } else {

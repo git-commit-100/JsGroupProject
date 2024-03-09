@@ -24,20 +24,29 @@
             />
             <p class="errorMsg">Task title cannot be empty</p>
           </div>
-          <div class="task-assignedBy">
-            <label for="assignedBy">Assigned By</label>
-            <select name="assignedBy" id="assignedBy">
-              <option value="Akshay Kumar">Akshay Kumar</option>
-              <option value="Bhargav Kashiya">Bhargav Kashiya</option>
-              <option value="Jayalekshmi">Jayalekshmi</option>
-              <option value="Joemol Joy">Joemol Joy</option>
-            </select>
+          <div class="wrapper">
+            <div class="task-assignedBy">
+              <label for="assignedBy">Assigned By</label>
+              <select name="assignedBy" id="assignedBy">
+                <option value="Akshay Kumar" selected>Akshay Kumar</option>
+                <option value="Bhargav Kashiya">Bhargav Kashiya</option>
+                <option value="Jayalekshmi">Jayalekshmi</option>
+                <option value="Joemol Joy">Joemol Joy</option>
+              </select>
+            </div>
+            <div class="task-priority">
+              <label for="taskPriority">Priority</label>
+              <select name="taskPriority" id="taskPriority">
+                <option value="Low" selected>Low</option>
+                <option value="High">High</option>
+              </select>
+            </div>
           </div>
           <div class="wrapper">
             <div class="task-status">
               <label for="taskStatus">Status</label>
               <select name="taskStatus" id="taskStatus">
-                <option value="Pending">Pending</option>
+                <option value="Pending" selected>Pending</option>
                 <option value="In Progress">In Progress</option>
                 <option value="Completed">Completed</option>
               </select>
@@ -65,7 +74,7 @@
       <div class="tasks-wrapper">
         <h3>Your planned tasks</h3>
         <input
-          placeholder="search for a task here"
+          placeholder="search for a task by title or assigned by"
           type="search"
           name="searchTask"
           id="searchTask"
@@ -82,6 +91,7 @@
       integrity="sha256-eKhayi8LEQwp4NKxN+CfCh+3qOVUtJn3QNZ0TciWLP4="
       crossorigin="anonymous"
     ></script>
+    <script src="https://code.iconify.design/iconify-icon/2.0.0/iconify-icon.min.js"></script>
     <script src="./index.js"></script>
   </body>
 </html>
