@@ -1,4 +1,5 @@
 let TASKS = [];
+let editingTaskId = null;
 
 $(document).ready(() => {
   getAllTasksFromLocalStorage();
@@ -9,6 +10,11 @@ $(document).ready(() => {
     if ($("#searchTask").val() === "") {
       prepareTasksCard();
     }
+  });
+  // Attach click event to the edit button using event delegation
+  $("#tasks").on("click", ".edit", function () {
+    const taskId = $(this).data("id");
+    editTask(taskId);
   });
 });
 
@@ -44,21 +50,38 @@ function submitHandler(e) {
     $("#taskDesc + p").css("display", "none");
   }
 
-  // construct form obj
-  let formObj = {
-    id: new Date().getTime(),
-    title: inputTitle,
-    desc: inputDesc,
-    dueDate: new Date(inputDate).toDateString(),
-    assignedBy: inputAssigned,
-    status: inputStatus,
-    priority: inputPriority,
-  };
 
-  addTaskToLocalStorage(formObj);
+  // Check if editing or adding a new task
+  if (editingTaskId !== null) {
+    // Update existing task
+    updateTask({
+      id: editingTaskId,
+      title: inputTitle,
+      desc: inputDesc,
+      dueDate: new Date(inputDate).toUTCString(),
+      assignedBy: inputAssigned,
+      status: inputStatus,
+      priority: inputPriority,
+    });
+  } else {
+    // construct form obj
+    let formObj = {
+      id: new Date().getTime(),
+      title: inputTitle,
+      desc: inputDesc,
+      dueDate: new Date(inputDate).toUTCString(),
+      assignedBy: inputAssigned,
+      status: inputStatus,
+      priority: inputPriority,
+    };
+
+    addTaskToLocalStorage(formObj);
+  }
   // resetting form
   $("#taskForm").trigger("reset");
   prepareTasksCard();
+  editingTaskId = null;
+  $("#submitBtn").text("Add Task");
 }
 
 function getAllTasksFromLocalStorage() {
@@ -79,30 +102,35 @@ function prepareTasksCard(tasks = TASKS) {
   } else {
     html = tasks
       .map((task) => {
-        return `<div class="task ${
-          task.status === "In Progress"
-            ? "inProgress"
-            : task.status === "Pending"
+        const utcDate = new Date(task.dueDate);
+        const day = utcDate.getUTCDate().toString().padStart(2, '0');
+        const month = utcDate.toLocaleString('default', { month: 'short', timeZone: 'UTC' });
+        const year = utcDate.getUTCFullYear();
+        const weekday = utcDate.toLocaleString('default', { weekday: 'short', timeZone: 'UTC' });
+
+        const formattedDueDate = `${weekday}, ${day} ${month} ${year}`;
+
+        return `<div class="task ${task.status === "In Progress"
+          ? "inProgress"
+          : task.status === "Pending"
             ? "pending"
             : "completed"
-        }" id="${task.id}">
+          }" id="${task.id}">
             <h3 class="title">${task.title} 
-            ${
-              task.priority === "High"
-                ? `<span class="badge">
+            ${task.priority === "High"
+            ? `<span class="badge" data-tooltip="High Priority">
             <iconify-icon icon="solar:danger-circle-bold"></iconify-icon>
             </span>`
-                : ""
-            }
+            : ""
+          }
             </h3>
-            <p class="assignedBy">Assigned by: <span>${
-              task.assignedBy
-            }</span></p>
-            <p class="dueDate">Due date: <span>${task.dueDate}</span></p>
+            <p class="assignedBy">Assigned by: <span>${task.assignedBy
+          }</span></p>
+            <p class="dueDate">Due date: <span>${formattedDueDate}</span></p>
             <p class="desc">${task.desc}</p>
             <p class="status">Status: <span>${task.status}</span></p>
             <div class="actions">
-            <button class="edit">Edit Task</button>
+            <button class="edit"  data-id="${task.id}">Edit Task</button>
             <button class="delete">Delete Task</button>
             </div>
             </div>`;
@@ -111,6 +139,10 @@ function prepareTasksCard(tasks = TASKS) {
   }
 
   $("#tasks").html(html);
+  $(".edit").click(function () {
+    const taskId = $(this).data("id");
+    editTask(taskId);
+  });
 }
 
 function addTaskToLocalStorage(formObj) {
@@ -131,5 +163,36 @@ function searchTasks() {
     prepareTasksCard(filteredTasks);
   } else {
     prepareTasksCard(TASKS);
+  }
+}
+
+// Function to handle task editing
+function editTask(taskId) {
+  const task = TASKS.find(task => task.id === taskId);
+  if (task) {
+    $("#taskTitle").val(task.title);
+    $("#assignedBy").val(task.assignedBy);
+    $("#taskPriority").val(task.priority);
+    $("#taskStatus").val(task.status);
+    $("#taskDueDate").val(new Date(task.dueDate).toISOString().split('T')[0]); // Convert to YYYY-MM-DD format
+    $("#taskDesc").val(task.desc);
+    editingTaskId = taskId; // Set editing task ID
+
+    // Scroll to the top of the page
+    $('html, body').animate({
+      scrollTop: 0
+    }, 500);
+
+    // Change the submit button text to "Update Task"
+    $("#submitBtn").text("Update Task");
+  }
+}
+
+// Function to update an existing task in local storage
+function updateTask(updatedTask) {
+  const taskIndex = TASKS.findIndex(task => task.id === updatedTask.id);
+  if (taskIndex !== -1) {
+    TASKS[taskIndex] = updatedTask;
+    localStorage.setItem("tasks", JSON.stringify(TASKS));
   }
 }
