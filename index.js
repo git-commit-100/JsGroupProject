@@ -50,7 +50,6 @@ function submitHandler(e) {
     $("#taskDesc + p").css("display", "none");
   }
 
-
   // Check if editing or adding a new task
   if (editingTaskId !== null) {
     // Update existing task
@@ -82,6 +81,9 @@ function submitHandler(e) {
   prepareTasksCard();
   editingTaskId = null;
   $("#submitBtn").text("Add Task");
+
+  // scroll to tasks -> to see tasks on add / edit
+  $("html, body").animate({ scrollTop: $("html, body")[0].scrollHeight }, 500);
 }
 
 function getAllTasksFromLocalStorage() {
@@ -103,29 +105,38 @@ function prepareTasksCard(tasks = TASKS) {
     html = tasks
       .map((task) => {
         const utcDate = new Date(task.dueDate);
-        const day = utcDate.getUTCDate().toString().padStart(2, '0');
-        const month = utcDate.toLocaleString('default', { month: 'short', timeZone: 'UTC' });
+        const day = utcDate.getUTCDate().toString().padStart(2, "0");
+        const month = utcDate.toLocaleString("default", {
+          month: "short",
+          timeZone: "UTC",
+        });
         const year = utcDate.getUTCFullYear();
-        const weekday = utcDate.toLocaleString('default', { weekday: 'short', timeZone: 'UTC' });
+        const weekday = utcDate.toLocaleString("default", {
+          weekday: "short",
+          timeZone: "UTC",
+        });
 
         const formattedDueDate = `${weekday}, ${day} ${month} ${year}`;
 
-        return `<div class="task ${task.status === "In Progress"
-          ? "inProgress"
-          : task.status === "Pending"
+        return `<div class="task ${
+          task.status === "In Progress"
+            ? "inProgress"
+            : task.status === "Pending"
             ? "pending"
             : "completed"
-          }" id="${task.id}">
+        }" id="${task.id}">
             <h3 class="title">${task.title} 
-            ${task.priority === "High"
-            ? `<span class="badge" data-tooltip="High Priority">
+            ${
+              task.priority === "High"
+                ? `<span class="badge" data-tooltip="High Priority">
             <iconify-icon icon="solar:danger-circle-bold"></iconify-icon>
             </span>`
-            : ""
-          }
+                : ""
+            }
             </h3>
-            <p class="assignedBy">Assigned by: <span>${task.assignedBy
-          }</span></p>
+            <p class="assignedBy">Assigned by: <span>${
+              task.assignedBy
+            }</span></p>
             <p class="dueDate">Due date: <span>${formattedDueDate}</span></p>
             <p class="desc">${task.desc}</p>
             <p class="status">Status: <span>${task.status}</span></p>
@@ -168,20 +179,23 @@ function searchTasks() {
 
 // Function to handle task editing
 function editTask(taskId) {
-  const task = TASKS.find(task => task.id === taskId);
+  const task = TASKS.find((task) => task.id === taskId);
   if (task) {
     $("#taskTitle").val(task.title);
     $("#assignedBy").val(task.assignedBy);
     $("#taskPriority").val(task.priority);
     $("#taskStatus").val(task.status);
-    $("#taskDueDate").val(new Date(task.dueDate).toISOString().split('T')[0]); // Convert to YYYY-MM-DD format
+    $("#taskDueDate").val(new Date(task.dueDate).toISOString().split("T")[0]); // Convert to YYYY-MM-DD format
     $("#taskDesc").val(task.desc);
     editingTaskId = taskId; // Set editing task ID
 
     // Scroll to the top of the page
-    $('html, body').animate({
-      scrollTop: 0
-    }, 500);
+    $("html, body").animate(
+      {
+        scrollTop: 0,
+      },
+      500
+    );
 
     // Change the submit button text to "Update Task"
     $("#submitBtn").text("Update Task");
@@ -190,7 +204,7 @@ function editTask(taskId) {
 
 // Function to update an existing task in local storage
 function updateTask(updatedTask) {
-  const taskIndex = TASKS.findIndex(task => task.id === updatedTask.id);
+  const taskIndex = TASKS.findIndex((task) => task.id === updatedTask.id);
   if (taskIndex !== -1) {
     TASKS[taskIndex] = updatedTask;
     localStorage.setItem("tasks", JSON.stringify(TASKS));
