@@ -5,7 +5,9 @@ $(document).ready(() => {
   getAllTasksFromLocalStorage();
   prepareTasksCard();
   $("#taskForm").submit((e) => submitHandler(e));
+  // Event to search on input change
   $("#searchTask").on("input", () => searchTasks());
+  // Event to handle search when user clears the input
   $("#searchTask").on("search", () => {
     if ($("#searchTask").val() === "") {
       prepareTasksCard();
@@ -21,24 +23,15 @@ $(document).ready(() => {
 // Attach click event to the delete button using event delegation
 $("#tasks").on("click", ".delete", function () {
   const taskId = $(this).closest(".task").prop("id");
-  deleteTask(taskId);
-});
+  const taskName = $(this).closest(".task").find(".title").text().trim();
+  // Prompt user for confirmation
+  const confirmDelete = confirm(`Are you sure you want to delete "${taskName}" task? `);
 
-function deleteTask(taskId) {
-  // Find the index of the task in the TASKS array
-  const taskIndex = TASKS.findIndex((task) => task.id == taskId);
-
-  if (taskIndex !== -1) {
-    // task removal from array
-    TASKS.splice(taskIndex, 1);
-
-    // local storage updated
-    localStorage.setItem("tasks", JSON.stringify(TASKS));
-
-    // Update the UI
-    prepareTasksCard();
+  // Delete task on user confirmation
+  if (confirmDelete) {
+    deleteTask(taskId);
   }
-}
+});
 
 function submitHandler(e) {
   e.preventDefault();
@@ -179,15 +172,13 @@ function prepareTasksCard(tasks = TASKS) {
   });
 }
 
-
-
-
 function addTaskToLocalStorage(formObj) {
   getAllTasksFromLocalStorage();
   TASKS.push(formObj);
   localStorage.setItem("tasks", JSON.stringify(TASKS));
 }
 
+// Function to perform search based on user input
 function searchTasks() {
   const searchText = $("#searchTask").val().trim().toLowerCase();
   if (searchText !== "") {
@@ -234,6 +225,22 @@ function updateTask(updatedTask) {
   if (taskIndex !== -1) {
     TASKS[taskIndex] = updatedTask;
     localStorage.setItem("tasks", JSON.stringify(TASKS));
+  }
+}
+
+function deleteTask(taskId) {
+  // Find the index of the task in the TASKS array
+  const taskIndex = TASKS.findIndex((task) => task.id == taskId);
+
+  if (taskIndex !== -1) {
+    // task removal from array
+    TASKS.splice(taskIndex, 1);
+
+    // local storage updated
+    localStorage.setItem("tasks", JSON.stringify(TASKS));
+
+    // Update the UI
+    prepareTasksCard();
   }
 }
 
