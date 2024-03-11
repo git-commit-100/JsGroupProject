@@ -18,6 +18,28 @@ $(document).ready(() => {
   });
 });
 
+// Attach click event to the delete button using event delegation
+$("#tasks").on("click", ".delete", function () {
+  const taskId = $(this).closest(".task").prop("id");
+  deleteTask(taskId);
+});
+
+function deleteTask(taskId) {
+  // Find the index of the task in the TASKS array
+  const taskIndex = TASKS.findIndex((task) => task.id == taskId);
+
+  if (taskIndex !== -1) {
+    // task removal from array
+    TASKS.splice(taskIndex, 1);
+
+    // local storage updated
+    localStorage.setItem("tasks", JSON.stringify(TASKS));
+
+    // Update the UI
+    prepareTasksCard();
+  }
+}
+
 function submitHandler(e) {
   e.preventDefault();
 
@@ -144,6 +166,7 @@ function prepareTasksCard(tasks = TASKS) {
             <button class="edit"  data-id="${task.id}">Edit Task</button>
             <button class="delete">Delete Task</button>
             </div>
+            
             </div>`;
       })
       .join("");
@@ -155,6 +178,9 @@ function prepareTasksCard(tasks = TASKS) {
     editTask(taskId);
   });
 }
+
+
+
 
 function addTaskToLocalStorage(formObj) {
   getAllTasksFromLocalStorage();
@@ -210,3 +236,4 @@ function updateTask(updatedTask) {
     localStorage.setItem("tasks", JSON.stringify(TASKS));
   }
 }
+
