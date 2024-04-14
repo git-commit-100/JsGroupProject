@@ -1,8 +1,9 @@
 let TASKS = [];
 let editingTaskId = null;
+let api = "http://localhost:8080";
 
-$(document).ready(() => {
-  getAllTasksFromLocalStorage();
+$(document).ready(async () => {
+  await getAllTasks();
   prepareTasksCard();
   $("#taskForm").submit((e) => submitHandler(e));
   // Event to search on input change
@@ -25,7 +26,9 @@ $("#tasks").on("click", ".delete", function () {
   const taskId = $(this).closest(".task").prop("id");
   const taskName = $(this).closest(".task").find(".title").text().trim();
   // Prompt user for confirmation
-  const confirmDelete = confirm(`Are you sure you want to delete "${taskName}" task? `);
+  const confirmDelete = confirm(
+    `Are you sure you want to delete "${taskName}" task? `
+  );
 
   // Delete task on user confirmation
   if (confirmDelete) {
@@ -89,7 +92,8 @@ function submitHandler(e) {
       priority: inputPriority,
     };
 
-    addTaskToLocalStorage(formObj);
+    // post request
+    createTask(formObj);
   }
   // resetting form
   $("#taskForm").trigger("reset");
@@ -101,14 +105,33 @@ function submitHandler(e) {
   $("html, body").animate({ scrollTop: $("html, body")[0].scrollHeight }, 500);
 }
 
-function getAllTasksFromLocalStorage() {
-  let allTasks = localStorage.getItem("tasks");
-
-  if (!allTasks) {
-    TASKS = [];
-  } else {
-    TASKS = JSON.parse(allTasks);
+async function getAllTasks() {
+  try {
+    const response = await fetch(`${api}/tasks`);
+    const tasks = await response.json();
+    TASKS = JSON.parse(tasks);
+  } catch (error) {
+    console.error("Error fetching tasks:", error);
   }
+}
+
+function createTask(taskData) {
+  const xhr = new XMLHttpRequest();
+  xhr.open("POST", `${api}/create`, true);
+  xhr.setRequestHeader("Content-Type", "application/json");
+
+  xhr.onload = function () {
+    if (xhr.status === 200) {
+      const data = JSON.parse(xhr.responseText);
+      console.log("Task created successfully:", data);
+    }
+  };
+
+  xhr.onerror = function (error) {
+    console.error("Error creating task:", error);
+  };
+
+  xhr.send(JSON.stringify(taskData));
 }
 
 function prepareTasksCard(tasks = TASKS) {
@@ -170,12 +193,6 @@ function prepareTasksCard(tasks = TASKS) {
     const taskId = $(this).data("id");
     editTask(taskId);
   });
-}
-
-function addTaskToLocalStorage(formObj) {
-  getAllTasksFromLocalStorage();
-  TASKS.push(formObj);
-  localStorage.setItem("tasks", JSON.stringify(TASKS));
 }
 
 // Function to perform search based on user input
@@ -243,4 +260,3 @@ function deleteTask(taskId) {
     prepareTasksCard();
   }
 }
-
