@@ -28,8 +28,18 @@ const getAllTasks = async (req, res) => {
   return res.json(JSON.stringify(tasks));
 };
 
-const getOneTask = (req, res) => {
+const getOneTask = async (req, res) => {
   const { id } = req.params;
+  try {
+    const tasks = await getTasks();
+    const task = tasks.find(task => task.id == id);
+    if (!task) {
+      return res.status(404).json({ message: "Task not found" });
+    }
+    return res.json(JSON.stringify(task));
+  } catch (error) {
+    return res.status(500).json({ message: "Internal server error" });
+  }
 };
 
 const createTask = async (req, res) => {
