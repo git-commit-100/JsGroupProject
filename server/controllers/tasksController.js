@@ -22,6 +22,8 @@ async function saveTasks(tasks) {
   }
 }
 
+
+
 // controllers
 const getAllTasks = async (req, res) => {
   const tasks = await getTasks();
@@ -57,8 +59,20 @@ const updateTask = (req, res) => {
   const { id } = req.params;
 };
 
-const deleteTask = (req, res) => {
+const deleteTask = async (req, res) => {
   const { id } = req.params;
+  try {
+    let tasks = await getTasks(); // Retrieve all tasks
+    tasks = tasks.filter(task => task.id !== id); // Filter out the task to be deleted
+    await saveTasks(tasks); // Save the updated tasks list
+    res.status(200).json({ message: "Task deleted successfully" });
+  } catch (error) {
+    console.error("Error deleting task:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+
+
+
 };
 
 module.exports = {
