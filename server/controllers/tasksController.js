@@ -55,8 +55,28 @@ const createTask = async (req, res) => {
   res.status(201).json({ message: "Tasks entered successfully !" });
 };
 
-const updateTask = (req, res) => {
-  const { id } = req.params;
+const updateTask = async (req, res) => {
+  const { id } = req.params;  
+  const updatedTask = req.body;
+
+  try {
+      const tasks = await getTasks();  
+      const taskIndex = tasks.findIndex(task => task.id == id);  
+
+      if (taskIndex == -1) {
+          return res.status(404).json({ message: "Task not found" }); 
+      }
+
+      // Merge the existing task with new data
+      tasks[taskIndex] = { ...tasks[taskIndex], ...updatedTask }; 
+
+      await saveTasks(tasks); 
+      res.status(200).json({ message: "Task updated successfully!" }); 
+  } catch (error) {
+      console.error("Error updating task:", error);
+      res.status(500).json({ message: "Internal server error" });
+  }
+
 };
 
 const deleteTask = async (req, res) => {

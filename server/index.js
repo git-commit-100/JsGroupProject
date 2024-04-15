@@ -19,7 +19,7 @@ app.get("/task/:id", getOneTask);
 
 app.post("/create", createTask);
 
-app.post("/update/:id", updateTask);
+app.put("/tasks/:id", updateTask);
 
 app.post("/delete/:id", deleteTask);
 

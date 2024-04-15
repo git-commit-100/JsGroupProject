@@ -219,9 +219,9 @@ function editTask(taskId) {
     $("#assignedBy").val(task.assignedBy);
     $("#taskPriority").val(task.priority);
     $("#taskStatus").val(task.status);
-    $("#taskDueDate").val(new Date(task.dueDate).toISOString().split("T")[0]); // Convert to YYYY-MM-DD format
+    $("#taskDueDate").val(new Date(task.dueDate).toISOString().split("T")[0]); 
     $("#taskDesc").val(task.desc);
-    editingTaskId = taskId; // Set editing task ID
+    editingTaskId = taskId; 
 
     // Scroll to the top of the page
     $("html, body").animate(
@@ -236,13 +236,31 @@ function editTask(taskId) {
   }
 }
 
-// Function to update an existing task in local storage
+// Function to update an existing tasks
 function updateTask(updatedTask) {
-  const taskIndex = TASKS.findIndex((task) => task.id === updatedTask.id);
-  if (taskIndex !== -1) {
-    TASKS[taskIndex] = updatedTask;
-    localStorage.setItem("tasks", JSON.stringify(TASKS));
-  }
+const taskIndex = TASKS.findIndex((task) => task.id === updatedTask.id);
+if (taskIndex !== -1) {
+    TASKS[taskIndex] = updatedTask;  // Update the local TASKS array
+    // Make a PUT request to update the task on the server
+    const xhr = new XMLHttpRequest();
+    xhr.open("PUT", `${api}/tasks/${updatedTask.id}`, true);
+    xhr.setRequestHeader("Content-Type", "application/json");
+
+    xhr.onload = function () {
+        if (xhr.status === 200) {
+            console.log("Task updated successfully:", xhr.responseText);
+            prepareTasksCard();  
+        } else {
+            console.error("Failed to update task:", xhr.responseText);
+        }
+    };
+
+    xhr.onerror = function () {
+        console.error("Error updating task:");
+    };
+
+    xhr.send(JSON.stringify(updatedTask)); 
+}
 }
 
 function deleteTask(taskId) {
