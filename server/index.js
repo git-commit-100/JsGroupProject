@@ -21,10 +21,10 @@ app.post("/create", createTask);
 
 app.put("/tasks/:id", updateTask);
 
-app.post("/delete/:id", deleteTask);
+app.delete("/delete/:id", deleteTask);
 
 app.use("/", (req, res) => {
-  return res.status(404).json("404 Not found !");
+  return res.status(404).json("Task Manager API");
 });
 
 app.listen(PORT, () => {

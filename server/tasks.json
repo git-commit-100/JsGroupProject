@@ -1,1 +1,20 @@
-[]
+[
+  {
+    "id": 1713223770812,
+    "title": "Test JS App",
+    "desc": "testing js app",
+    "dueDate": "Thu, 18 Apr 2024 00:00:00 GMT",
+    "assignedBy": "Bhargav Kashiya",
+    "status": "In Progress",
+    "priority": "High"
+  },
+  {
+    "id": 1713223796012,
+    "title": "react app setup",
+    "desc": "setting up react project",
+    "dueDate": "Sun, 14 Apr 2024 00:00:00 GMT",
+    "assignedBy": "Jayalekshmi",
+    "status": "Completed",
+    "priority": "Low"
+  }
+]

@@ -219,9 +219,9 @@ function editTask(taskId) {
     $("#assignedBy").val(task.assignedBy);
     $("#taskPriority").val(task.priority);
     $("#taskStatus").val(task.status);
-    $("#taskDueDate").val(new Date(task.dueDate).toISOString().split("T")[0]); 
+    $("#taskDueDate").val(new Date(task.dueDate).toISOString().split("T")[0]);
     $("#taskDesc").val(task.desc);
-    editingTaskId = taskId; 
+    editingTaskId = taskId;
 
     // Scroll to the top of the page
     $("html, body").animate(
@@ -238,46 +238,42 @@ function editTask(taskId) {
 
 // Function to update an existing tasks
 function updateTask(updatedTask) {
-const taskIndex = TASKS.findIndex((task) => task.id === updatedTask.id);
-if (taskIndex !== -1) {
-    TASKS[taskIndex] = updatedTask;  // Update the local TASKS array
+  const taskIndex = TASKS.findIndex((task) => task.id === updatedTask.id);
+  if (taskIndex !== -1) {
+    TASKS[taskIndex] = updatedTask; // Update the local TASKS array
     // Make a PUT request to update the task on the server
     const xhr = new XMLHttpRequest();
     xhr.open("PUT", `${api}/tasks/${updatedTask.id}`, true);
     xhr.setRequestHeader("Content-Type", "application/json");
 
     xhr.onload = function () {
-        if (xhr.status === 200) {
-            console.log("Task updated successfully:", xhr.responseText);
-            prepareTasksCard();  
-        } else {
-            console.error("Failed to update task:", xhr.responseText);
-        }
+      if (xhr.status === 200) {
+        console.log("Task updated successfully:", xhr.responseText);
+        prepareTasksCard();
+      } else {
+        console.error("Failed to update task:", xhr.responseText);
+      }
     };
 
     xhr.onerror = function () {
-        console.error("Error updating task:");
+      console.error("Error updating task:");
     };
 
-    xhr.send(JSON.stringify(updatedTask)); 
-}
+    xhr.send(JSON.stringify(updatedTask));
+  }
 }
 
 const deleteTask = async (taskId) => {
   try {
-    const response = await fetch(`${api}/tasks/${taskId}`, {
-      method: 'DELETE',
+    const response = await fetch(`${api}/delete/${taskId}`, {
+      method: "delete",
     });
-    if (response.ok) {
-      const data = await response.json();
-      console.log("Task deleted successfully:", data);
-      // Update local TASKS array after deletion
-      TASKS = TASKS.filter(task => task.id !== taskId);
-      // Update UI
-      prepareTasksCard();
-    } else {
-      throw new Error(`Error deleting task: ${response.statusText}`);
-    }
+    const data = await response.json();
+    console.log("Task deleted successfully:", data);
+    // Update local TASKS array after deletion
+    TASKS = TASKS.filter((task) => task.id != taskId);
+    // Update UI
+    prepareTasksCard();
   } catch (error) {
     console.error(error);
   }
