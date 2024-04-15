@@ -263,18 +263,22 @@ if (taskIndex !== -1) {
 }
 }
 
-function deleteTask(taskId) {
-  // Find the index of the task in the TASKS array
-  const taskIndex = TASKS.findIndex((task) => task.id == taskId);
-
-  if (taskIndex !== -1) {
-    // task removal from array
-    TASKS.splice(taskIndex, 1);
-
-    // local storage updated
-    localStorage.setItem("tasks", JSON.stringify(TASKS));
-
-    // Update the UI
-    prepareTasksCard();
+const deleteTask = async (taskId) => {
+  try {
+    const response = await fetch(`${api}/tasks/${taskId}`, {
+      method: 'DELETE',
+    });
+    if (response.ok) {
+      const data = await response.json();
+      console.log("Task deleted successfully:", data);
+      // Update local TASKS array after deletion
+      TASKS = TASKS.filter(task => task.id !== taskId);
+      // Update UI
+      prepareTasksCard();
+    } else {
+      throw new Error(`Error deleting task: ${response.statusText}`);
+    }
+  } catch (error) {
+    console.error(error);
   }
-}
+};
